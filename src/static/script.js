@@ -70,6 +70,7 @@ window.openModal = (src, type) => {
         modalImg.style.display = "none";
         modalVid.classList.add("video-content");
         modalImg.classList.remove("image-content");
+        modalVid.querySelector("source").src = src; // Set source for the video tag
         modalVid.load(); // Load the video to ensure it plays
         modalVid.play(); // Autoplay video
     }
@@ -90,5 +91,4 @@ window.onclick = (event) => {
         modalVid.currentTime = 0; // Reset video to start
     }
 }
-
 
