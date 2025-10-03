@@ -30,18 +30,25 @@ with app.app_context():
     if PortfolioItem.query.count() == 0:
         sample_items = [
             PortfolioItem(
-                title="Project Alpha",
-                src="https://via.placeholder.com/300x200.png?text=Project+Alpha",
+                title="Project BBA",
+                src="https://cdn.discordapp.com/attachments/1391280671703437322/1420329864577286224/image.png?ex=68e0de44&is=68df8cc4&hm=da583bfe506b4b6b71b4e349da8b48f82558bd1f5c48a50efc8f4911883e2222&",
                 type="image",
-                category="Web Design",
-                description="A sleek web design project."
+                category="Model + Rig",
+                description=""
             ),
             PortfolioItem(
-                title="Project Beta",
-                src="https://www.w3schools.com/html/mov_bbb.mp4",
-                type="video",
-                category="Video Editing",
-                description="A short promotional video."
+                title="Project BBA2",
+                src="https://cdn.discordapp.com/attachments/1391280671703437322/1419875248509157396/image.png?ex=68e0885f&is=68df36df&hm=dd5eec90998dd33c747906e37f56fd19494248236d017a508ebb2187f296dcec&",
+                type="image",
+                category="Model + Rig",
+                description=""
+            ),
+            PortfolioItem(
+                title="UGC ITEM",
+                src="https://cdn.discordapp.com/attachments/1391280671703437322/1420821547031199856/image.png?ex=68e0adee&is=68df5c6e&hm=a12783cf1c9d995c7a248e5e32e2d2ea6839848fb48479602f0607de8791abd2&",
+                type="image",
+                category="Model",
+                description="A sleek web design project."
             )
         ]
         
