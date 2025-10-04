@@ -190,6 +190,76 @@ with app.app_context():
                 type="video",
                 category="3D Model",
                 description=""
+            ),
+                        PortfolioItem(
+                title="3D Model",
+                src="https://cdn.discordapp.com/attachments/1424029054721327124/1424034640477421718/355060505_187267150974456_5694582941283590755_n.png?ex=68e27b1b&is=68e1299b&hm=2ab2cecd16d2bd4bb31cb0e74d934906aea393dcaeec0466604e62f47226b828&",
+                type="image",
+                category="3D Model",
+                description=""
+            ),
+            PortfolioItem(
+                title="3D Model",
+                src="https://cdn.discordapp.com/attachments/1424029054721327124/1424035169727156356/6548_1.png?ex=68e27b99&is=68e12a19&hm=a1a2cf78228fb97f6cd5a1aaa17fdb599e327ac1d5910881c920f96221d8cc1e&",
+                type="image",
+                category="3D Model",
+                description=""
+            ),
+            PortfolioItem(
+                title="3D Model",
+                src="https://cdn.discordapp.com/attachments/1424029054721327124/1424035170364686518/6485_1.png?ex=68e27b99&is=68e12a19&hm=ce15f9a178f18819061bbb1ac7b9efb41e15a16b2f25e785780437f2b4bb82a0&",
+                type="image",
+                category="3D Model",
+                description=""
+            ),
+            PortfolioItem(
+                title="3D Model",
+                src="https://cdn.discordapp.com/attachments/1424029054721327124/1424035172214640800/64_1.png?ex=68e27b9a&is=68e12a1a&hm=553a9fa4a9d176aa94a31cb241cb8ee030bc2837ef2fd02cde944cdedfd45433&",
+                type="image",
+                category="3D Model",
+                description=""
+            ),
+            PortfolioItem(
+                title="3D Model",
+                src="https://media.discordapp.net/attachments/1424029054721327124/1424035480701370408/image_3.png?ex=68e27be3&is=68e12a63&hm=5e0041e1625d9aa9bbc68fe738770e376ad76870f5304dcc3e0ca655aff5223b&=&format=webp&quality=lossless",
+                type="image",
+                category="3D Model",
+                description=""
+            ),
+            PortfolioItem(
+                title="3D Model",
+                src="https://media.discordapp.net/attachments/1424029054721327124/1424034755279847545/goliath_frog.png?ex=68e27b36&is=68e129b6&hm=b97d469f2ccf1bf4f4c712f857decb6105965d3e904d23d540b0776f94f3ad09&=&format=webp&quality=lossless&width=902&height=902",
+                type="image",
+                category="3D Model",
+                description=""
+            ),
+            PortfolioItem(
+                title="3D Model",
+                src="https://media.discordapp.net/attachments/1424029054721327124/1424035255290953848/2025-08-29_175330_1.png?ex=68e27bae&is=68e12a2e&hm=630a30cb9bbdc5f15217b8bc2d5dec510cdc227cf08d082ba29671439b5df197&=&format=webp&quality=lossless",
+                type="image",
+                category="3D Model",
+                description=""
+            ),
+            PortfolioItem(
+                title="3D Model",
+                src="https://media.discordapp.net/attachments/1424029054721327124/1424035174768705646/b21df1f7-20c1-41a7-ba7f-ecfbe12a9a91_1_-_.jpg?ex=68e27b9a&is=68e12a1a&hm=e6c3237dfa86f1b3840e49051a23a98dcb9370bbdf0db6aa0ed79e41c1cd559c&=&format=webp",
+                type="image",
+                category="3D Model",
+                description=""
+            ),
+            PortfolioItem(
+                title="3D Model",
+                src="https://cdn.discordapp.com/attachments/1424029054721327124/1424036736576782356/2025-09-21_214047.png?ex=68e27d0f&is=68e12b8f&hm=c3f7804dc7e7166b358031a77a9f253c6d78846a336e6101808d0719cdb3b8a0&",
+                type="image",
+                category="3D Model",
+                description=""
+            ),
+            PortfolioItem(
+                title="3D Model",
+                src="https://cdn.discordapp.com/attachments/1424029054721327124/1424036737113395422/6105fbbf-e3ce-45b6-b6a4-d2537f74e891_1.jpg?ex=68e27d0f&is=68e12b8f&hm=a3040c23bd82d57c583dec74cb5484f0613794afa6957964d36f4d28d5907562&",
+                type="image",
+                category="3D Model",
+                description=""
             )
         ]
         
