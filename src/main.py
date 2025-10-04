@@ -31,24 +31,24 @@ with app.app_context():
         sample_items = [
             PortfolioItem(
                 title="Project BBA",
-                src="https://cdn.discordapp.com/attachments/1391280671703437322/1420329864577286224/image.png?ex=68e0de44&is=68df8cc4&hm=da583bfe506b4b6b71b4e349da8b48f82558bd1f5c48a50efc8f4911883e2222&",
+                src="https://cdn.discordapp.com/attachments/1386369407260950599/1421503447802577107/image.png?ex=68e1d780&is=68e08600&hm=cae075f75748adaf1f894c0be80d4a7d396b1cce9604a141f9962aeff3730be8&",
                 type="image",
                 category="Model + Rig",
                 description=""
             ),
             PortfolioItem(
                 title="Project BBA2",
-                src="https://cdn.discordapp.com/attachments/1391280671703437322/1419875248509157396/image.png?ex=68e0885f&is=68df36df&hm=dd5eec90998dd33c747906e37f56fd19494248236d017a508ebb2187f296dcec&",
+                src="https://cdn.discordapp.com/attachments/1386369407260950599/1420793520104538182/image.png?ex=68e1e554&is=68e093d4&hm=e936dddc637e7b36475de55433ec265a0aa7001d6c5fea3f2e2a221adb9aec9f&",
                 type="image",
-                category="Model + Rig",
+                category="Model + Build",
                 description=""
             ),
             PortfolioItem(
-                title="UGC ITEM",
-                src="https://cdn.discordapp.com/attachments/1391280671703437322/1420821547031199856/image.png?ex=68e0adee&is=68df5c6e&hm=a12783cf1c9d995c7a248e5e32e2d2ea6839848fb48479602f0607de8791abd2&",
-                type="image",
-                category="Model",
-                description="A sleek web design project."
+                title="Horse Animation",
+                src="https://cdn.discordapp.com/attachments/1386369407260950599/1416799173667192853/2025-09-14_215248.mp4?ex=68e1ddcd&is=68e08c4d&hm=79e19a2e48e6dc0ef8405c305f377601bdc26e7c1df978897875bff83ea18b9e&",
+                type="video",
+                category="Animation",
+                description=""
             )
         ]
         
