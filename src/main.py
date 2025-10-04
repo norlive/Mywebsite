@@ -49,6 +49,13 @@ with app.app_context():
                 type="video",
                 category="Animation",
                 description=""
+            ),
+            PortfolioItem(
+                title="Test",
+                src="https://drive.google.com/file/d/1DkMOlsIe0SyDRvJGGQg_cQtxoMcoyrkF/view?usp=sharing",
+                type="image",
+                category="Animation",
+                description=""
             )
         ]
         
