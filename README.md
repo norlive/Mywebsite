@@ -7,6 +7,7 @@ A Flask + SQLite application that powers a portfolio gallery with an admin conso
 - SQLite-backed SQLAlchemy models for `User` and `PortfolioItem` records.
 - REST-style routes for listing, creating, updating, and deleting users.
 - Portfolio routes with admin authentication for adding or removing gallery items.
+- Admin upload pipeline for images/videos with server-side validation and static hosting.
 - Static frontend in `src/static` that consumes the API, including an admin dashboard and media modal.
 - CLI helper (`flask --app src.main seed-portfolio`) that seeds sample data.
 
@@ -39,6 +40,9 @@ A Flask + SQLite application that powers a portfolio gallery with an admin conso
 4. **Configure environment variables**
    - Copy `.env.example` to `.env` in the repository root.
    - Update values (especially `SECRET_KEY` and `ADMIN_SECRET_ID`) to suit your environment.
+   - Optional overrides:
+     - `MAX_UPLOAD_SIZE_MB` (default 200) limits individual upload size in megabytes.
+     - `UPLOAD_FOLDER` defaults to `src/static/uploads` and must stay under `src/static` for hosting.
 
 5. **Initialize the database**
    - The app will create `src/database/app.db` on first run.
@@ -60,6 +64,7 @@ Base URL: `/api`
 | ------ | -------- | ----------- |
 | GET | `/portfolio` | List all portfolio items (public). |
 | POST | `/portfolio` | Add one or more portfolio items (admin only; expects `admin_id` and `items`). |
+| POST | `/portfolio/upload` | Upload a media file (multipart form data with `file` + `admin_id`; returns hosted `src`). |
 | DELETE | `/portfolio/<item_id>` | Remove a portfolio item (admin only). |
 | POST | `/admin/login` | Validate admin ID. |
 | GET | `/users` | List all users. |
@@ -76,10 +81,16 @@ Base URL: `/api`
 - JSON bodies are required for write operations.
 - The API returns structured error messages with appropriate HTTP status codes (400, 401, 404, 409, 500).
 
+### Media Uploads
+- Uploaded files are stored under `src/static/uploads` (created automatically on app start).
+- Filenames are randomized and sanitized; the API response returns a `/static/...` path suitable for saving on portfolio items.
+- Supported image extensions: jpg, jpeg, png, gif, webp. Supported video extensions: mp4, mov, avi, mkv, webm, m4v.
+- Adjust size limits via `MAX_UPLOAD_SIZE_MB` or change the destination folder with `UPLOAD_FOLDER`.
+
 ## Frontend Notes
 - `src/static/index.html` renders the public gallery and consumes `/api/portfolio`.
 - Media items open inside a modal with image/video support.
-- `src/static/admin.html` implements login, item creation, and deletion workflows.
+- `src/static/admin.html` implements login, item creation, deletion, and direct media uploads that feed the portfolio API.
 
 ## Database Seeding
 The production app no longer seeds data automatically. Use the provided CLI command; it inserts a trimmed set of sample records. You can customize `src/database/seed.py` or add your own scripts.
