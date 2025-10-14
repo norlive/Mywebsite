@@ -1,5 +1,10 @@
+import os
+from uuid import uuid4
+from urllib.parse import urlparse
+
 from flask import Blueprint, current_app, jsonify, request
 from sqlalchemy.exc import SQLAlchemyError
+from werkzeug.utils import secure_filename
 
 from src.models.user import db
 from src.models.portfolio import PortfolioItem
@@ -16,11 +21,114 @@ def _verify_admin(payload):
     return admin_secret and provided == admin_secret
 
 
+def _extract_extension_from_src(src_value):
+    if not src_value:
+        return ""
+
+    parsed = urlparse(src_value)
+    path = parsed.path or src_value
+    _, extension = os.path.splitext(path)
+    return extension.lstrip(".").lower()
+
+
+def _infer_media_type_from_extension(extension):
+    if not extension:
+        return None
+
+    image_exts = current_app.config.get("ALLOWED_IMAGE_EXTENSIONS", set())
+    video_exts = current_app.config.get("ALLOWED_VIDEO_EXTENSIONS", set())
+
+    if extension in image_exts:
+        return "image"
+    if extension in video_exts:
+        return "video"
+    return None
+
+
+def _build_static_url(file_path):
+    static_folder = current_app.static_folder
+    if not static_folder:
+        return None
+
+    static_root = os.path.abspath(static_folder)
+    absolute_path = os.path.abspath(file_path)
+
+    try:
+        common = os.path.commonpath([static_root, absolute_path])
+    except ValueError:
+        return None
+
+    if common != static_root:
+        return None
+
+    relative_path = os.path.relpath(absolute_path, static_root)
+    normalized = relative_path.replace(os.sep, "/")
+    return f"/static/{normalized}"
+
+
+def _save_uploaded_file(file_storage):
+    filename = secure_filename(file_storage.filename or "")
+    extension = filename.rsplit(".", 1)[1].lower() if "." in filename else ""
+
+    media_type = _infer_media_type_from_extension(extension)
+    if not media_type:
+        raise ValueError("Unsupported file type. Please upload approved image or video formats.")
+
+    upload_folder = current_app.config.get("UPLOAD_FOLDER")
+    if not upload_folder:
+        raise ValueError("Upload folder is not configured.")
+
+    os.makedirs(upload_folder, exist_ok=True)
+
+    unique_name = f"{uuid4().hex}.{extension}" if extension else uuid4().hex
+    saved_path = os.path.join(upload_folder, unique_name)
+
+    file_storage.save(saved_path)
+
+    public_src = _build_static_url(saved_path)
+    if not public_src:
+        os.remove(saved_path)
+        raise ValueError("UPLOAD_FOLDER must be inside the static directory to serve files.")
+
+    return {
+        "src": public_src,
+        "type": media_type,
+        "filename": unique_name,
+    }
+
+
 def _normalize_item_payload(item_payload):
     normalized = {key: (item_payload.get(key) or "").strip() for key in REQUIRED_FIELDS}
     normalized["description"] = (item_payload.get("description") or "").strip()
     normalized["type"] = normalized["type"].lower()
+
+    if normalized["type"] not in VALID_MEDIA_TYPES:
+        inferred_type = _infer_media_type_from_extension(_extract_extension_from_src(normalized["src"]))
+        if inferred_type:
+            normalized["type"] = inferred_type
+
     return normalized
+
+
+@portfolio_bp.route("/portfolio/upload", methods=["POST"])
+def upload_portfolio_media():
+    payload = request.form
+    if not _verify_admin(payload):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    file_storage = request.files.get("file")
+    if file_storage is None or not file_storage.filename:
+        return jsonify({"error": "No file provided."}), 400
+
+    try:
+        saved_info = _save_uploaded_file(file_storage)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    except OSError as exc:  # pragma: no cover - filesystem edge cases
+        current_app.logger.exception("Failed to store uploaded file: %s", exc)
+        return jsonify({"error": "Failed to store uploaded file."}), 500
+
+    return jsonify({"message": "Upload successful", **saved_info}), 201
 
 
 @portfolio_bp.route("/portfolio", methods=["GET"])

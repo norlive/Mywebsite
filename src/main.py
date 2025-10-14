@@ -15,6 +15,10 @@ def create_app(config_class=None):
     app = Flask(__name__, static_folder=STATIC_DIR)
     app.config.from_object(config_class or Config)
 
+    upload_folder = app.config.get("UPLOAD_FOLDER")
+    if upload_folder:
+        os.makedirs(upload_folder, exist_ok=True)
+
     CORS(app)
     db.init_app(app)
 
@@ -58,3 +62,4 @@ def register_cli_commands(app):
 if __name__ == "__main__":
     application = create_app()
     application.run(host="0.0.0.0", port=5000, debug=application.config.get("DEBUG", False))
+

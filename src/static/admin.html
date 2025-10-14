@@ -21,7 +21,7 @@
         }
         .login-form input[type="password"],
         .add-item-form input[type="text"],
-        .add-item-form input[type="url"],
+        .add-item-form input[type="file"],
         .add-item-form select,
         .add-item-form textarea {
             width: calc(100% - 20px);
@@ -31,6 +31,21 @@
             border-radius: 4px;
             background-color: #1a1a2e;
             color: #e0e0e0;
+        }
+        .add-item-form input[type="file"] {
+            padding: 6px;
+        }
+        .upload-status {
+            margin-top: -10px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #c0c0c0;
+        }
+        .upload-status.error {
+            color: #ff8080;
+        }
+        .upload-status.success {
+            color: #7be08e;
         }
         .login-form button,
         .add-item-form button {
@@ -102,7 +117,9 @@
                 <h3>Add New Item</h3>
                 <form id="add-item-form" class="add-item-form">
                     <input type="text" id="item-title" placeholder="Title" required>
-                    <input type="url" id="item-src" placeholder="Image/Video URL" required>
+                    <input type="text" id="item-src" placeholder="Image/Video URL or uploaded path" required>
+                    <input type="file" id="item-file" accept="image/*,video/*">
+                    <p id="upload-status" class="upload-status"></p>
                     <select id="item-type" required>
                         <option value="image">Image</option>
                         <option value="video">Video</option>
@@ -127,4 +144,3 @@
     <script src="admin.js"></script>
 </body>
 </html>
-

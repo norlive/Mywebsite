@@ -6,11 +6,34 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginSection = document.getElementById("login-section");
     const addItemForm = document.getElementById("add-item-form");
     const portfolioAdminList = document.getElementById("portfolio-admin-list");
+    const itemSrcInput = document.getElementById("item-src");
+    const itemFileInput = document.getElementById("item-file");
+    const itemTypeSelect = document.getElementById("item-type");
+    const uploadStatus = document.getElementById("upload-status");
 
     let currentAdminId = null;
 
     const setLoginMessage = (message) => {
         loginMessage.textContent = message || "";
+    };
+
+    const setUploadStatus = (message, statusClass = "") => {
+        if (!uploadStatus) {
+            return;
+        }
+        const classes = ["upload-status"];
+        if (statusClass) {
+            classes.push(statusClass);
+        }
+        uploadStatus.className = classes.join(" ");
+        uploadStatus.textContent = message || "";
+    };
+
+    const resetUploadState = () => {
+        if (itemFileInput) {
+            itemFileInput.value = "";
+        }
+        setUploadStatus("");
     };
 
     const clearPortfolioList = () => {
@@ -54,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const loadAdminPortfolioItems = async () => {
-        setPortfolioListStatus("Loading items…");
+        setPortfolioListStatus("Loading items...");
         try {
             const response = await fetch("/api/portfolio");
             if (!response.ok) {
@@ -67,6 +90,66 @@ document.addEventListener("DOMContentLoaded", () => {
             setPortfolioListStatus("Failed to load items.");
         }
     };
+
+    const handleFileUpload = async (file) => {
+        if (!file) {
+            return;
+        }
+
+        if (!currentAdminId) {
+            alert("Please login before uploading files.");
+            resetUploadState();
+            return;
+        }
+
+        setUploadStatus(`Uploading ${file.name}...`);
+
+        const formData = new FormData();
+        formData.append("admin_id", currentAdminId);
+        formData.append("file", file);
+
+        try {
+            const response = await fetch("/api/portfolio/upload", {
+                method: "POST",
+                body: formData,
+            });
+
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.error || "Upload failed");
+            }
+
+            if (itemSrcInput) {
+                itemSrcInput.value = result.src || "";
+            }
+            if (itemTypeSelect && result.type) {
+                const normalizedType = result.type.toLowerCase();
+                if (["image", "video"].includes(normalizedType)) {
+                    itemTypeSelect.value = normalizedType;
+                }
+            }
+
+            setUploadStatus(`Uploaded ${file.name}`, "success");
+        } catch (error) {
+            console.error("Upload error:", error);
+            setUploadStatus(error.message || "Upload failed.", "error");
+            if (itemFileInput) {
+                itemFileInput.value = "";
+            }
+        }
+    };
+
+    if (itemFileInput) {
+        itemFileInput.disabled = true;
+        itemFileInput.addEventListener("change", async () => {
+            const [file] = itemFileInput.files || [];
+            if (!file) {
+                resetUploadState();
+                return;
+            }
+            await handleFileUpload(file);
+        });
+    }
 
     loginForm.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -91,6 +174,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 setLoginMessage("");
                 loginSection.style.display = "none";
                 adminPanel.style.display = "block";
+                if (itemFileInput) {
+                    itemFileInput.disabled = false;
+                }
                 await loadAdminPortfolioItems();
             } else {
                 setLoginMessage(result.message || "Invalid Admin ID");
@@ -109,12 +195,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const title = document.getElementById("item-title").value.trim();
-        const src = document.getElementById("item-src").value.trim();
-        const type = document.getElementById("item-type").value;
+        const src = itemSrcInput ? itemSrcInput.value.trim() : "";
+        const type = itemTypeSelect ? itemTypeSelect.value : "";
         const category = document.getElementById("item-category").value.trim();
         const description = document.getElementById("item-description").value.trim();
 
-        if (!title || !src || !category) {
+        if (!title || !src || !category || !type) {
             alert("Please fill in all required fields.");
             return;
         }
@@ -145,6 +231,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (response.ok) {
                 alert("Item added successfully!");
                 addItemForm.reset();
+                resetUploadState();
+                if (itemSrcInput) {
+                    itemSrcInput.value = "";
+                }
                 await loadAdminPortfolioItems();
             } else {
                 alert(`Failed to add item: ${result.error || "Unknown error"}`);
