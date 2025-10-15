@@ -1,94 +1,150 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const portfolioItemsContainer = document.getElementById('portfolio-items');
+document.addEventListener("DOMContentLoaded", () => {
+    const portfolioItemsContainer = document.getElementById("portfolio-items");
+    const statusMessage = document.createElement("p");
 
-    // Function to load portfolio items from API
-    const loadPortfolioItems = async () => {
-        try {
-            const response = await fetch('/api/portfolio');
-            const data = await response.json();
+    const setStatus = (message, cssClass = "") => {
+        statusMessage.textContent = message;
+        statusMessage.className = cssClass;
+        if (!portfolioItemsContainer.contains(statusMessage)) {
+            portfolioItemsContainer.appendChild(statusMessage);
+        }
+    };
 
-            portfolioItemsContainer.innerHTML = ''; // Clear existing items
+    const clearStatus = () => {
+        if (portfolioItemsContainer.contains(statusMessage)) {
+            portfolioItemsContainer.removeChild(statusMessage);
+        }
+    };
 
-            if (data.portfolio && data.portfolio.length > 0) {
-                data.portfolio.forEach(item => {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.classList.add('portfolio-item');
+    const createMediaElement = (item) => {
+        const mediaType = (item.type || "").toLowerCase();
+        const mediaSrc = item.src;
+        if (!mediaSrc) {
+            const fallback = document.createElement("p");
+            fallback.textContent = "Missing media source.";
+            fallback.className = "error-message";
+            return fallback;
+        }
 
-                    let mediaElement;
-                    if (item.type === 'image') {
-                        mediaElement = `<img src="${item.src}" alt="${item.title}" onclick="openModal('${item.src}', 'image')">`;
-                    } else if (item.type === 'video') {
-                        mediaElement = `<video controls src="${item.src}" onclick="openModal('${item.src}', 'video')"></video>`;
-                    }
+        if (mediaType === "image") {
+            const img = document.createElement("img");
+            img.src = mediaSrc;
+            img.alt = item.title || "Portfolio image";
+            img.addEventListener("click", () => openModal(mediaSrc, "image"));
+            return img;
+        }
+        if (mediaType === "video") {
+            const video = document.createElement("video");
+            video.src = mediaSrc;
+            video.controls = true;
+            video.addEventListener("click", () => openModal(mediaSrc, "video"));
+            return video;
+        }
+        const fallback = document.createElement("p");
+        fallback.textContent = "Unsupported media type.";
+        fallback.className = "error-message";
+        return fallback;
+    };
 
-                    itemDiv.innerHTML = `
-                        <h3>${item.title}</h3>
-                        <p>Category: ${item.category}</p>
-                        ${mediaElement}
-                        <p>${item.description}</p>
-                    `;
-                    portfolioItemsContainer.appendChild(itemDiv);
-                });
-            } else {
-                portfolioItemsContainer.innerHTML = '<p>No portfolio items found.</p>';
+    const renderPortfolioItems = (items) => {
+        portfolioItemsContainer.innerHTML = "";
+        if (!Array.isArray(items) || items.length === 0) {
+            setStatus("No portfolio items found.", "loading");
+            return;
+        }
+
+        clearStatus();
+        items.forEach((item) => {
+            const itemDiv = document.createElement("div");
+            itemDiv.classList.add("portfolio-item");
+
+            const title = document.createElement("h3");
+            title.textContent = item.title || "Untitled";
+
+            const category = document.createElement("p");
+            category.textContent = `Category: ${item.category || "Uncategorized"}`;
+
+            const description = document.createElement("p");
+            description.textContent = item.description || "";
+
+            itemDiv.appendChild(title);
+            itemDiv.appendChild(category);
+            itemDiv.appendChild(createMediaElement(item));
+            if (description.textContent) {
+                itemDiv.appendChild(description);
             }
+
+            portfolioItemsContainer.appendChild(itemDiv);
+        });
+    };
+
+    const loadPortfolioItems = async () => {
+        setStatus("Loading portfolio…", "loading");
+        try {
+            const response = await fetch("/api/portfolio");
+            if (!response.ok) {
+                throw new Error(`Request failed with status ${response.status}`);
+            }
+            const data = await response.json();
+            renderPortfolioItems(data.portfolio);
         } catch (error) {
-            console.error('Error loading portfolio items:', error);
-            portfolioItemsContainer.innerHTML = '<p>Failed to load portfolio items.</p>';
+            console.error("Error loading portfolio items:", error);
+            setStatus("Failed to load portfolio items.", "error-message");
         }
     };
 
     loadPortfolioItems();
 });
 
+// Modal helpers
 
+defineModalHandlers();
 
+function defineModalHandlers() {
+    const modal = document.getElementById("myModal");
+    const modalImg = document.getElementById("img01");
+    const modalVid = document.getElementById("vid01");
+    const source = modalVid ? modalVid.querySelector("source") : null;
+    const closeElement = document.getElementsByClassName("close")[0];
 
-// Get the modal
-const modal = document.getElementById("myModal");
-
-// Get the image and video elements inside the modal
-const modalImg = document.getElementById("img01");
-const modalVid = document.getElementById("vid01");
-const modalContentContainer = document.getElementById("modal-content-container");
-
-// Get the <span> element that closes the modal
-const span = document.getElementsByClassName("close")[0];
-
-// Function to open the modal
-window.openModal = (src, type) => {
-    modal.style.display = "flex"; // Use flex to center content
-    if (type === "image") {
-        modalImg.src = src;
-        modalImg.style.display = "block";
-        modalVid.style.display = "none";
-        modalImg.classList.add("image-content");
-        modalVid.classList.remove("video-content");
-    } else if (type === "video") {
-        modalVid.src = src;
-        modalVid.style.display = "block";
-        modalImg.style.display = "none";
-        modalVid.classList.add("video-content");
-        modalImg.classList.remove("image-content");
-        modalVid.querySelector("source").src = src; // Set source for the video tag
-        modalVid.load(); // Load the video to ensure it plays
-        modalVid.play(); // Autoplay video
+    if (!modal || !modalImg || !modalVid || !closeElement) {
+        return;
     }
-}
 
-// When the user clicks on <span> (x), close the modal
-span.onclick = () => {
-    modal.style.display = "none";
-    modalVid.pause(); // Pause video when closing modal
-    modalVid.currentTime = 0; // Reset video to start
-}
+    window.openModal = (src, type) => {
+        modal.style.display = "flex";
+        if (type === "image") {
+            modalImg.src = src;
+            modalImg.style.display = "block";
+            modalVid.style.display = "none";
+            modalVid.pause();
+            modalVid.currentTime = 0;
+        } else if (type === "video") {
+            modalVid.pause();
+            modalVid.currentTime = 0;
+            modalVid.removeAttribute("src");
+            if (source) {
+                source.src = src;
+            }
+            modalVid.src = src;
+            modalVid.load();
+            modalVid.play();
+            modalVid.style.display = "block";
+            modalImg.style.display = "none";
+        }
+    };
 
-// When the user clicks anywhere outside of the modal content, close it
-window.onclick = (event) => {
-    if (event.target == modal) {
+    const closeModal = () => {
         modal.style.display = "none";
-        modalVid.pause(); // Pause video when closing modal
-        modalVid.currentTime = 0; // Reset video to start
-    }
-}
+        modalVid.pause();
+        modalVid.currentTime = 0;
+    };
 
+    closeElement.addEventListener("click", closeModal);
+
+    window.addEventListener("click", (event) => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+}
